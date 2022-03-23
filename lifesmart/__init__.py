@@ -42,46 +42,44 @@ CONF_LIFESMART_APPTOKEN = "apptoken"
 CONF_LIFESMART_USERTOKEN = "usertoken"
 CONF_LIFESMART_USERID = "userid"
 CONF_EXCLUDE_ITEMS = "exclude"
-SWTICH_TYPES = ["SL_SF_RC",
-"SL_SW_RC",
-"SL_SW_IF3",
-"SL_SF_IF3",
-"SL_SW_CP3",
-"SL_SW_RC3",
-"SL_SW_IF2",
-"SL_SF_IF2",
-"SL_SW_CP2",
-"SL_SW_FE2",
-"SL_SW_RC2",
-"SL_SW_ND2",
-"SL_MC_ND2",
-"SL_SW_IF1",
-"SL_SF_IF1",
-"SL_SW_CP1",
-"SL_SW_FE1",
-"SL_OL_W",
-"SL_SW_RC1",
-"SL_SW_ND1",
+SWTICH_TYPES = ["OD_WE_OT1",
 "SL_MC_ND1",
-"SL_SW_ND3",
+"SL_MC_ND2",
 "SL_MC_ND3",
-"SL_SW_ND2",
-"SL_MC_ND2",
-"SL_SW_ND1",
-"SL_MC_ND1",
-"SL_S",
-"SL_SPWM",
-"SL_P_SW",
-"SL_SW_DM1",
-"SL_SW_MJ2",
-"SL_SW_MJ1",
+"SL_NATURE",
 "SL_OL",
 "SL_OL_3C",
 "SL_OL_DE",
 "SL_OL_UK",
 "SL_OL_UL",
-"OD_WE_OT1",
-"SL_NATURE"
+"SL_OL_W",
+"SL_P_SW",
+"SL_S",
+"SL_SF_IF1",
+"SL_SF_IF2",
+"SL_SF_IF3",
+"SL_SF_RC",
+"SL_SPWM",
+"SL_SW_CP1",
+"SL_SW_CP2",
+"SL_SW_CP3",
+"SL_SW_DM1",
+"SL_SW_FE1",
+"SL_SW_FE2",
+"SL_SW_IF1",
+"SL_SW_IF2",
+"SL_SW_IF3",
+"SL_SW_MJ1",
+"SL_SW_MJ2",
+"SL_SW_ND1",
+"SL_SW_ND2",
+"SL_SW_ND3",
+"SL_SW_NS3",
+"SL_SW_RC",
+"SL_SW_RC1",
+"SL_SW_RC2",
+"SL_SW_RC3",
+"V_IND_S"
 ]
 LIGHT_SWITCH_TYPES = ["SL_OL_W",
 "SL_SW_IF1",
@@ -303,12 +301,12 @@ def setup(hass, config):
         if msg['msg']['idx'] != "s" and msg['msg']['me'] not in exclude_items:
             devtype = msg['msg']['devtype']
             agt = msg['msg']['agt'].replace("_","")
-            if devtype in SWTICH_TYPES and msg['msg']['idx'] in ["L1","L2","L3","P1","P2","P3"]:
+            if devtype in SWTICH_TYPES and msg['msg']['idx'] in ["L1","L2","L3","P1","P2","P3","P4","P5","P6","P7","P8","P9"]:
                 enid = "switch."+(devtype + "_" + agt + "_" + msg['msg']['me'] + "_" + msg['msg']['idx']).lower()
                 attrs = hass.states.get(enid).attributes
                 if msg['msg']['type'] % 2 == 1:
                     hass.states.set(enid, 'on',attrs)
-                else:
+                elif msg['msg']['type'] % 2 == 0:
                     hass.states.set(enid, 'off',attrs)
             elif devtype in BINARY_SENSOR_TYPES and msg['msg']['idx'] in ["M","G","B","AXS","P1"]:
                 enid = "binary_sensor."+(devtype + "_" + agt + "_" + msg['msg']['me'] + "_" + msg['msg']['idx']).lower()
@@ -473,7 +471,10 @@ class LifeSmartDevice(Entity):
 
     def __init__(self, dev, idx, val, param):
         """Initialize the switch."""
-        self._name = dev['name'] + "_" + idx
+        if dev['devtype'] in SWTICH_TYPES and dev['devtype'] not in ["SL_NATURE","SL_SW_ND1","SL_SW_ND2","SL_SW_ND3"]:
+          self._name = dev['name'] + "_" + dev['data'][idx]['name']  
+        else:
+          self._name = dev['name'] + "_" + idx
         self._appkey = param['appkey']
         self._apptoken = param['apptoken']
         self._usertoken = param['usertoken']
