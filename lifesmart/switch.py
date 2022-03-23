@@ -9,7 +9,7 @@ from . import LifeSmartDevice
 
 
 from homeassistant.components.switch import (
-    SwitchDevice,
+    SwitchEntity,
     ENTITY_ID_FORMAT,
 )
 
@@ -24,12 +24,12 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     param = discovery_info.get("param")
     devices = []
     for idx in dev['data']:
-        if idx in ["L1","L2","L3","P1","P2","P3"]:
+        if idx in ["L1","L2","L3","P1","P2","P3","P4","P5","P6","P7","P8","P9"]:
             devices.append(LifeSmartSwitch(dev,idx,dev['data'][idx],param))
     add_entities(devices)
     return True
 
-class LifeSmartSwitch(LifeSmartDevice, SwitchDevice):
+class LifeSmartSwitch(LifeSmartDevice, SwitchEntity):
     
 
     def __init__(self, dev, idx, val, param):
