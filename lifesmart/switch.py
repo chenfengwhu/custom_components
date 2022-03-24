@@ -23,8 +23,18 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     dev = discovery_info.get("dev")
     param = discovery_info.get("param")
     devices = []
+    IDX_TYPES = []
+    if dev['devtype'] in ["SL_SW_ND3","SL_MC_ND3","SL_NATURE"]:
+        IDX_TYPES =["L1","L2","L3","P1","P2","P3"]
+    elif dev['devtype'] in ["SL_SW_ND2","SL_MC_ND2"]:
+        IDX_TYPES =["L1","L2","L3","P1","P2"]
+    elif dev['devtype'] in ["SL_SW_ND1","SL_MC_ND1","SL_SW_DM1"]:
+        IDX_TYPES =["L1","L2","L3","P1"]
+    else :
+        IDX_TYPES =["L1","L2","L3","P1","P2","P3","P4","P5","P6","P7","P8","P9"]
+
     for idx in dev['data']:
-        if idx in ["L1","L2","L3","P1","P2","P3","P4","P5","P6","P7","P8","P9"]:
+        if idx in IDX_TYPES:
             devices.append(LifeSmartSwitch(dev,idx,dev['data'][idx],param))
     add_entities(devices)
     return True
